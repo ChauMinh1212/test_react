@@ -1,6 +1,4 @@
-import { FormEvent, useEffect, useState } from "react"
-import { useForm } from "react-hook-form"
-import InputAuth from "~/components/Input/InputAuth"
+import { useEffect, useState } from "react"
 import LoginForm from "~/features/Auth/LoginForm"
 
 const Left = () => {
@@ -35,15 +33,6 @@ const Left = () => {
 }
 
 const AuthPage = () => {
-    const [formData, setFormData] = useState({
-        username: '',
-        password: ''
-    })
-
-    const handleLogin = (e: FormEvent<HTMLFormElement>): void => {
-        e.preventDefault()
-        return
-    }
     
     return (
         <div className="flex">

@@ -1,8 +1,7 @@
 import { Route, Routes } from 'react-router-dom'
-import Footer from './components/Footer/Footer'
-import HomePage from './pages/HomePage/HomePage'
 import './App.css'
 import AuthPage from './pages/AuthPage/AuthPage'
+import HomePage from './pages/HomePage/HomePage'
 
 export default function App() {
   return (
