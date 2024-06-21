@@ -5,6 +5,8 @@ import moment from 'moment'
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers"
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
+import * as XLSX from 'xlsx';
+import { saveAs } from 'file-saver';
 
 
 const style = {
@@ -48,6 +50,16 @@ const HomePage = () => {
         handleOnClickDetail(e.row.detail)
         
     }
+
+    const handleExport = () => {
+        const ws = XLSX.utils.json_to_sheet(data);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, 'Data');
+        const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+    
+        const sheet = new Blob([excelBuffer], { type: 'application/octet-stream' });
+        saveAs(sheet, 'data.xlsx');
+      };
 
     const columns: GridColDef[] = [
         { field: 'name', headerName: 'MA', width: 130, flex: 0.5},
@@ -148,37 +160,6 @@ const HomePage = () => {
                     </TableContainer>
                 }
                 <p className="mt-[10px]">Kết quả:</p>
-                {/* <TableContainer component={Paper}>
-                    <Table sx={{ minWidth: 650 }} aria-label="simple table">
-                        <TableHead>
-                            <TableRow>
-                                <TableCell>MA</TableCell>
-                                <TableCell>Tổng hiệu suất sinh lời</TableCell>
-                                <TableCell>Tổng số lượng lệnh</TableCell>
-                                <TableCell>Hiệu suất sinh lời max</TableCell>
-                                <TableCell>Hiệu suất sinh lời min</TableCell>
-                                <TableCell>Hiệu suất sinh lời trung bình</TableCell>
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {data.length != 0 && data.map((row, index) => (
-                                <TableRow
-                                    key={index}
-                                    sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-                                >
-                                    <TableCell component="th" scope="row" onClick={() => handleOnClickDetail(row.detail)} className="cursor-pointer">
-                                        {row.name}
-                                    </TableCell>
-                                    <TableCell align="right">{(row.total * 100).toFixed(2)}</TableCell>
-                                    <TableCell align="right">{(row.count)}</TableCell>
-                                    <TableCell align="right">{(row.max * 100).toFixed(2)}</TableCell>
-                                    <TableCell align="right">{(row.min * 100).toFixed(2)}</TableCell>
-                                    <TableCell align="right">{row.count == 0 ? 0 : (row.total / row.count * 100).toFixed(2)}</TableCell>
-                                </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
-                </TableContainer> */}
                 <div style={{ height: 400, width: '100%' }}>
                     <DataGrid
                         rows={data.map((item, index) => ({
@@ -194,6 +175,7 @@ const HomePage = () => {
                         onCellClick={handleCellClick}
                     />
                 </div>
+            <Button onClick={handleExport}>Excel</Button>
             </div>
         </>
 
