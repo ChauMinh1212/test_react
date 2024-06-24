@@ -284,51 +284,48 @@ const stock = [
 
 const ListStockPage = () => {
     const [data, setData] = useState<any[]>([])
+    const [loading, setLoading] = useState(true)
 
     const columns: GridColDef[] = [
-        { field: 'code', headerName: 'Mã', width: 130, flex: 0.5 },
-        { field: 'name', headerName: 'MA_max', type: 'string', sortable: false, flex: 1, },
-        { field: 'p_2024', headerName: 'Tổng số lượng lệnh', type: 'number', sortable: true, flex: 1, },
-        { field: 'max', headerName: 'Hiệu suất sinh lời max', type: 'number', sortable: true, flex: 1, },
-        { field: 'min', headerName: 'Hiệu suất sinh lời min', type: 'number', sortable: true, flex: 1, },
-        { field: 'avg', headerName: 'Hiệu suất sinh lời trung bình', type: 'number', sortable: true, flex: 1 },
+        { field: 'code', headerName: 'Mã', width: 130, flex: 0.5, align: 'center', headerAlign: 'center'},
+        { field: 'closePrice', headerName: 'Giá', type: 'number', sortable: true, flex: 1, align: 'center', headerAlign: 'center'},
+        { field: 'name', headerName: 'MA_max', type: 'string', sortable: false, flex: 1, align: 'center', headerAlign: 'center'},
+        { field: 'total', headerName: 'Hiệu suất sinh lời', type: 'number', sortable: true, flex: 1, align: 'center', headerAlign: 'center'},
+        { field: 'p_2024', headerName: 'Tìm năng tăng giá 2024', type: 'number', sortable: true, flex: 1, align: 'center', headerAlign: 'center'},
+        { field: 'p_2025', headerName: 'Tìm năng tăng giá 2025', type: 'number', sortable: true, flex: 1, align: 'center', headerAlign: 'center'},
+        { field: 'signal', headerName: 'Tín hiệu', type: 'string', sortable: true, flex: 1, align: 'center', headerAlign: 'center', cellClassName: (params) => params.value == 'Mua' ? 'text-green-500' : (params.value == 'Bán' ? 'text-red-500' : '')},
     ];
 
     const getData = async () => {
-        const res = await axiosClient.post('investment/test-all-stock', { stock: stock.map(item => item.code), from: '2023-06-21', to: '2024-06-21' })
-        setData(stock.map((item, index) => ({
-            ...item,
-            id: index,
-            name: res.data.data[index].name,
-        })));
+        const res = await axiosClient.post('investment/test-all-stock', { stock: stock.map(item => item.code), from: '2023-06-24', to: '2024-06-24' })
 
+        setData(stock.map((item, index) => {
+            const da = res.data.find((detail: any) => detail.code == item.code)
+            return {
+                ...item,
+                id: index,
+                ...da,
+                signal: da.signal == 0 ? 'Mua' : da.signal == 1 ? 'Bán' : '',
+                total: (da.total * 100).toFixed(2)
+            }
+        }
+        ));
+        setLoading(false)
     }
 
     useEffect(() => {
         (async () => {
-            try {
-                // await async "fetchBooks()" function
-                await getData();
-
-            } catch (err) {
-                console.log('Error occured when fetching books');
-            }
+            await getData();
         })();
     }, [])
+
     return (
-        <div style={{ height: 400, width: '100%' }}>
+        <div style={{ height: 700, width: '100%' }}>
             <DataGrid
-                rows={data.map((item, index) => ({
-                    ...item,
-                    id: index,
-                    total: (item.total * 100).toFixed(2),
-                    min: (item.min * 100).toFixed(2),
-                    max: (item.max * 100).toFixed(2),
-                    avg: item.count == 0 ? 0 : (item.total / item.count * 100).toFixed(2)
-                }))}
+                rows={data}
                 columns={columns}
                 pageSizeOptions={[5, 10]}
-            // onCellClick={handleCellClick}
+                loading={loading}
             />
         </div>
     )
