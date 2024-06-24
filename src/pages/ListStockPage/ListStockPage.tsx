@@ -406,7 +406,7 @@ const ListStockPage = () => {
         { field: 'closePrice', headerName: 'Giá', type: 'number', sortable: true, flex: 1, align: 'center', headerAlign: 'center' },
         { field: 'price_2024', headerName: 'Giá mục tiêu 2024', type: 'number', sortable: true, flex: 1, align: 'center', headerAlign: 'center' },
         { field: 'p_2024', headerName: 'Tìm năng tăng giá 2024', type: 'number', sortable: true, flex: 1, align: 'center', headerAlign: 'center' },
-        { field: 'price_2025', headerName: 'Giá mục tiêu 2024', type: 'number', sortable: true, flex: 1, align: 'center', headerAlign: 'center' },
+        { field: 'price_2025', headerName: 'Giá mục tiêu 2025', type: 'number', sortable: true, flex: 1, align: 'center', headerAlign: 'center' },
         { field: 'p_2025', headerName: 'Tìm năng tăng giá 2025', type: 'number', sortable: true, flex: 1, align: 'center', headerAlign: 'center' },
         { field: 'name', headerName: 'MA_max', type: 'string', sortable: false, flex: 1, align: 'center', headerAlign: 'center' },
         { field: 'total', headerName: 'Hiệu suất sinh lời theo MA_max', type: 'number', sortable: true, flex: 1, align: 'center', headerAlign: 'center' },
@@ -421,8 +421,9 @@ const ListStockPage = () => {
         setData(stock.map((item, index) => {
             const da = res.data.find((detail: any) => detail.code == item.code)
             const closePrice = da.closePrice / 1000
-            const p_2024 = item.price_2024 ? ((closePrice - item.price_2024) / item.price_2024 * 100).toFixed(2) : 0
-            const p_2025 = item.price_2025 ? ((closePrice - item.price_2025) / item.price_2025 * 100).toFixed(2) : 0
+            const p_2024 = item.price_2024 ? ((item.price_2024 - closePrice) / closePrice * 100).toFixed(2) : 0
+            const p_2025 = item.price_2025 ? ((item.price_2025 - closePrice) / closePrice * 100).toFixed(2) : 0
+
             return {
                 ...item,
                 id: index,
