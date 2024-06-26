@@ -25,12 +25,15 @@ const ListStockPage = () => {
     const [open, setOpen] = useState(false);
     const [openModalDelete, setOpenModalDelete] = useState(false);
     const [openModalCreate, setOpenModalCreate] = useState(false);
+    const [openModalDetail, setOpenModalDetail] = useState(false);
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
     const handleCloseModalDelete = () => setOpenModalDelete(false);
     const handleCloseModalCreate = () => setOpenModalCreate(false);
+    const handleCloseModalDetail = () => setOpenModalDetail(false);
     const [dataModal, setDataModal] = useState<any>(null)
     const [fromTo, setFromTo] = useState([moment().format('YYYY-MM-DD'), moment().subtract(2, 'year').format('YYYY-MM-DD')])
+    const [dataModalDetail, setDataModalDetail] = useState<any>(null)
 
     const handleEditClick = (row: any) => {
         handleOpen()
@@ -40,29 +43,30 @@ const ListStockPage = () => {
 
 
     const columns: GridColDef[] = [
-        { field: 'code', headerName: 'Mã', width: 130, flex: 0.5, align: 'center', headerAlign: 'center' },
-        { field: 'closePrice', headerName: 'Giá', type: 'number', sortable: true, flex: 1, align: 'center', headerAlign: 'center' },
+        { field: 'code', headerName: 'Mã', width: 60, align: 'center', headerAlign: 'center', cellClassName: (params) => 'cursor-pointer'},
+        { field: 'closePrice', headerName: 'Giá', width: 80, type: 'number', sortable: true, align: 'center', headerAlign: 'center' },
         { field: 'price_2024', headerName: 'Giá mục tiêu 2024', type: 'number', sortable: true, flex: 1, align: 'center', headerAlign: 'center' },
-        { field: 'p_2024', headerName: 'Tìm năng tăng giá 2024', type: 'number', sortable: true, flex: 1, align: 'center', headerAlign: 'center' },
+        { field: 'p_2024', headerName: 'Tiềm năng tăng giá 2024 (%)', type: 'number', sortable: true, flex: 1, align: 'center', headerAlign: 'center' },
         { field: 'price_2025', headerName: 'Giá mục tiêu 2025', type: 'number', sortable: true, flex: 1, align: 'center', headerAlign: 'center' },
-        { field: 'p_2025', headerName: 'Tìm năng tăng giá 2025', type: 'number', sortable: true, flex: 1, align: 'center', headerAlign: 'center' },
-        { field: 'name', headerName: 'MA_max', type: 'string', sortable: false, flex: 1, align: 'center', headerAlign: 'center' },
+        { field: 'p_2025', headerName: 'Tiềm năng tăng giá 2025 (%)', type: 'number', sortable: true, flex: 1, align: 'center', headerAlign: 'center' },
+        { field: 'name', headerName: 'MA_max', type: 'string', sortable: false, width: 80, align: 'center', headerAlign: 'center' },
         { field: 'ma', headerName: 'Giá trị MA_max', type: 'string', sortable: false, flex: 1, align: 'center', headerAlign: 'center' },
-        { field: 'total', headerName: 'Hiệu suất sinh lời theo MA_max', type: 'number', sortable: true, flex: 1, align: 'center', headerAlign: 'center' },
-        { field: 'signal', headerName: 'Tín hiệu', type: 'string', sortable: true, flex: 1, align: 'center', headerAlign: 'center', cellClassName: (params) => params.value == 'Mua' ? 'text-green-500' : (params.value == 'Bán' ? 'text-red-500' : (params.value == 'Hold mua' ? 'text-green-300' : 'text-red-300')) },
+        { field: 'total', headerName: 'Hiệu suất sinh lời theo MA_max (%)', type: 'number', sortable: true, flex: 1, align: 'center', headerAlign: 'center' },
+        { field: 'signal', headerName: 'Tín hiệu', type: 'string', sortable: true, width: 90, align: 'center', headerAlign: 'center', cellClassName: (params) => params.value == 'Mua' ? 'text-green-500' : (params.value == 'Bán' ? 'text-red-500' : (params.value == 'Hold mua' ? 'text-green-300' : 'text-red-300')) },
         {
             field: 'actions',
             headerName: '',
             renderCell: (params) => (
                 <div>
-                    <IconButton color="primary" aria-label="Edit" onClick={() => handleEditClick(params.row)}>
+                    <IconButton color="primary" className="z-20 " aria-label="Edit" onClick={() => handleEditClick(params.row)}>
                         <Edit />
                     </IconButton>
-                    <IconButton color="secondary" aria-label="Delete" onClick={() => handleDeleteClick(params.row)}>
+                    <IconButton color="secondary" className="z-20" aria-label="Delete" onClick={() => handleDeleteClick(params.row)}>
                         <Delete />
                     </IconButton>
                 </div>
             ),
+            width: 100
         }
     ];
 
@@ -84,7 +88,7 @@ const ListStockPage = () => {
                 total: (item.total * 100).toFixed(2),
                 p_2024,
                 p_2025,
-                ma: (item.ma / 1000).toFixed(2)
+                ma: (item.ma / 1000).toFixed(2),
             }
         }
         ));
@@ -132,7 +136,6 @@ const ListStockPage = () => {
             handleClose()
         } catch (e) {
             console.log(e);
-            
         }
 
     }
@@ -156,6 +159,14 @@ const ListStockPage = () => {
 
     const handleClickCreate = () => {
         setOpenModalCreate(true)
+    }
+
+    const handleDetailClick = (row: any) => {
+        if(row.field == 'code'){
+            const item = data.find(item => item.code == row.row.code);
+            setDataModalDetail(item)
+            setOpenModalDetail(true)
+        }
     }
 
     const handleSubmitCreate = async (e: any) => {
@@ -236,6 +247,42 @@ const ListStockPage = () => {
                     </form>
                 </Box>
             </Modal>
+            {/* Modal detail cell */}
+            <Modal
+                open={openModalDetail}
+                onClose={handleCloseModalDetail}
+                aria-labelledby="modal-modal-title"
+                aria-describedby="modal-modal-description"
+            >
+                <Box sx={{...style, width: 500}}>
+                    <div className="flex justify-between">
+                        <div>
+                            <p className="mb-[20px]">Mã</p>
+                            <p className="mb-[20px]">Giá</p>
+                            <p className="mb-[20px]">Giá mục tiêu 2024</p>
+                            <p className="mb-[20px]">{`Tiềm năng tăng giá 2024 (%)`}</p>
+                            <p className="mb-[20px]">Giá mục tiêu 2025</p>
+                            <p className="mb-[20px]">{`Tiềm năng tăng giá 2025 (%)`}</p>
+                            <p className="mb-[20px]">MA_max</p>
+                            <p className="mb-[20px]">Giá trị MA_max</p>
+                            <p className="mb-[20px]">{`Hiệu suất sinh lời theo MA_max (%)`}</p>
+                            <p className="mb-[20px]">Tín hiệu</p>
+                        </div>
+                        <div>
+                            <p className="mb-[20px] text-blue-600">: {dataModalDetail?.code || ''}</p>
+                            <p className="mb-[20px] text-blue-600">: {dataModalDetail?.closePrice || 0}</p>
+                            <p className="mb-[20px] text-blue-600">: {dataModalDetail?.price_2024 || 0}</p>
+                            <p className="mb-[20px] text-blue-600">: {dataModalDetail?.p_2024 || 0}</p>
+                            <p className="mb-[20px] text-blue-600">: {dataModalDetail?.price_2025 || 0}</p>
+                            <p className="mb-[20px] text-blue-600">: {dataModalDetail?.p_2025 || 0}</p>
+                            <p className="mb-[20px] text-blue-600">: {dataModalDetail?.name || ''}</p>
+                            <p className="mb-[20px] text-blue-600">: {dataModalDetail?.ma || 0}</p>
+                            <p className="mb-[20px] text-blue-600">: {dataModalDetail?.total || 0}</p>
+                            <p className={`${dataModalDetail?.signal == 'Mua' ? 'text-green-500': dataModalDetail?.signal == 'Bán' ? 'text-red-500' : dataModalDetail?.signal == 'Hold mua' ? 'text-green-300': 'text-red-300'}`}>: {dataModalDetail?.signal || ''}</p>
+                            </div>
+                    </div>
+                </Box>
+            </Modal>
             <div className="m-[30px] ">
                 <div className="flex justify-between content-center">
                     <form onSubmit={handleSubmit} className="flex items-center mb-[20px]">
@@ -256,7 +303,9 @@ const ListStockPage = () => {
                         columns={columns}
                         pageSizeOptions={[5, 10]}
                         loading={loading}
-
+                        onCellClick={handleDetailClick}
+                        disableRowSelectionOnClick
+                        disableColumnSelector
                     />
                 </div>
             </div>
