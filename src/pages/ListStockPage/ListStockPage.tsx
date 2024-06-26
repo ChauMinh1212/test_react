@@ -1,6 +1,5 @@
 import { Delete, Edit } from "@mui/icons-material"
-import { LoadingButton } from "@mui/lab"
-import { Box, Button, IconButton, Modal, TextField } from "@mui/material"
+import { Button, IconButton } from "@mui/material"
 import { DataGrid, GridColDef } from "@mui/x-data-grid"
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers"
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs"
@@ -12,17 +11,6 @@ import ModalCreate from "~/components/ModalCreate/ModalCreate"
 import ModalDelete from "~/components/ModalDelete/ModalDelete"
 import ModalDetail from "~/components/ModalDetail/ModalDetail"
 import ModalUpdate from "~/components/ModalUpdate/ModalUpdate"
-
-const style = {
-    position: 'absolute' as 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    width: 400,
-    bgcolor: 'background.paper',
-    boxShadow: 24,
-    p: 4,
-};
 
 const ListStockPage = () => {
     const [data, setData] = useState<any[]>([])
