@@ -14,7 +14,7 @@ const style = {
     p: 4,
 };
 
-const ModalUpdate = ({ open, handleClose, dataModal, data, setData, isBetaPage }: any) => {
+const ModalUpdate = ({ open, handleClose, dataModal, setData, isBetaPage }: any) => {
     const [loading, setLoading] = useState<boolean>(false)
 
     const handleSubmitEdit = async (e: any) => {

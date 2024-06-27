@@ -14,7 +14,7 @@ const style = {
     p: 4,
 };
 
-const ModalCreate = ({ openModalCreate, handleCloseModalCreate, setData, data, isBetaPage, fromTo }: any) => {
+const ModalCreate = ({ openModalCreate, handleCloseModalCreate, setData, isBetaPage, fromTo }: any) => {
     const [loading, setLoading] = useState<boolean>(false)
 
     const handleSubmitCreate = async (e: any) => {
@@ -44,18 +44,33 @@ const ModalCreate = ({ openModalCreate, handleCloseModalCreate, setData, data, i
             const newP2024 = parseFloat(((price_2024 - closePrice) / closePrice * 100).toFixed(2))
             const newP2025 = parseFloat(((price_2025 - closePrice) / closePrice * 100).toFixed(2))
 
-            const newData = [...data, {
-                code, price_2024, price_2025,
-                closePrice,
-                p_2024: newP2024,
-                p_2025: newP2025,
-                ma: parseFloat((resFormat.ma / 1000).toFixed(2)),
-                total: parseFloat((resFormat.total * 100).toFixed(2)),
-                id: Math.random(),
-                name: resFormat.name,
-                signal: resFormat.signal == 0 ? 'MUA' : resFormat.signal == 1 ? 'BÁN' : resFormat.signal == 2 ? 'Hold mua' : 'Hold bán',
-            }]
-            setData(newData)
+            setData((prev: any) => {
+                const newData = [...prev, {
+                    code, price_2024, price_2025,
+                    closePrice,
+                    p_2024: newP2024,
+                    p_2025: newP2025,
+                    ma: parseFloat((resFormat.ma / 1000).toFixed(2)),
+                    total: parseFloat((resFormat.total * 100).toFixed(2)),
+                    id: Math.random(),
+                    name: resFormat.name,
+                    signal: resFormat.signal == 0 ? 'MUA' : resFormat.signal == 1 ? 'BÁN' : resFormat.signal == 2 ? 'Hold mua' : 'Hold bán',
+                }]
+                return newData
+            })
+
+            // const newData = [...data, {
+            //     code, price_2024, price_2025,
+            //     closePrice,
+            //     p_2024: newP2024,
+            //     p_2025: newP2025,
+            //     ma: parseFloat((resFormat.ma / 1000).toFixed(2)),
+            //     total: parseFloat((resFormat.total * 100).toFixed(2)),
+            //     id: Math.random(),
+            //     name: resFormat.name,
+            //     signal: resFormat.signal == 0 ? 'MUA' : resFormat.signal == 1 ? 'BÁN' : resFormat.signal == 2 ? 'Hold mua' : 'Hold bán',
+            // }]
+            // setData(newData)
             handleCloseModalCreate()
             setLoading(false)
         } catch (error) {

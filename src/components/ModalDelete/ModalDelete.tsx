@@ -14,7 +14,7 @@ const style = {
     p: 4,
 };
 
-const ModalDelete = ({ openModalDelete, handleCloseModalDelete, dataModal, setData, data }: any) => {
+const ModalDelete = ({ openModalDelete, handleCloseModalDelete, dataModal, setData }: any) => {
     const [loading, setLoading] = useState<boolean>(false)
     const handleDelete = async () => {
         try {
