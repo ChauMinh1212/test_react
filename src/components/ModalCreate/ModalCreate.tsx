@@ -14,8 +14,9 @@ const style = {
     p: 4,
 };
 
-const ModalCreate = ({ openModalCreate, handleCloseModalCreate, setData, fromTo, data }: any) => {
+const ModalCreate = ({ openModalCreate, handleCloseModalCreate, setData, data, isBetaPage, fromTo }: any) => {
     const [loading, setLoading] = useState<boolean>(false)
+
     const handleSubmitCreate = async (e: any) => {
         e.preventDefault()
         setLoading(true)
@@ -23,27 +24,43 @@ const ModalCreate = ({ openModalCreate, handleCloseModalCreate, setData, fromTo,
         const price_2024 = e.target[2].value
         const price_2025 = e.target[4].value
         try {
-            const res = await axiosClient.post('investment/create-beta-watch-list', { code, price_2024, price_2025, from: fromTo[0], to: fromTo[1] })
+            const res = await axiosClient.post('investment/create-beta-watch-list', {
+                code,
+                price_2024,
+                price_2025,
+                ...(!isBetaPage && {
+                    from: fromTo[0],
+                    to: fromTo[1]
+                }),
+                ...(isBetaPage && {
+                    ma: e.target[6]?.value || 0,
+                    is_beta_page: 1
+                })
+            })
 
-            const closePrice = res.data.max.closePrice / 1000
-            const newP2024 = ((price_2024 - closePrice) / closePrice * 100).toFixed(2)
-            const newP2025 = ((price_2025 - closePrice) / closePrice * 100).toFixed(2)
+            const resFormat = !isBetaPage ? res.data.max : res.data[0]
+
+            const closePrice = parseFloat((resFormat.closePrice / 1000).toFixed(2))
+            const newP2024 = parseFloat(((price_2024 - closePrice) / closePrice * 100).toFixed(2))
+            const newP2025 = parseFloat(((price_2025 - closePrice) / closePrice * 100).toFixed(2))
 
             const newData = [...data, {
                 code, price_2024, price_2025,
                 closePrice,
                 p_2024: newP2024,
                 p_2025: newP2025,
-                ma: (res.data.max.ma / 1000).toFixed(2),
-                total: (res.data.max.total * 100).toFixed(2),
+                ma: parseFloat((resFormat.ma / 1000).toFixed(2)),
+                total: parseFloat((resFormat.total * 100).toFixed(2)),
                 id: Math.random(),
-                name: res.data.max.name,
-                signal: res.data.max.signal == 0 ? 'Mua' : res.data.max.signal == 1 ? 'Bán' : res.data.max.signal == 2 ? 'Hold mua' : 'Hold bán',
+                name: resFormat.name,
+                signal: resFormat.signal == 0 ? 'MUA' : resFormat.signal == 1 ? 'BÁN' : resFormat.signal == 2 ? 'Hold mua' : 'Hold bán',
             }]
             setData(newData)
             handleCloseModalCreate()
             setLoading(false)
         } catch (error) {
+            handleCloseModalCreate()
+            setLoading(false)
             console.log(error);
         }
 
@@ -60,6 +77,9 @@ const ModalCreate = ({ openModalCreate, handleCloseModalCreate, setData, fromTo,
                     <TextField label="Mã" fullWidth className="!mb-[20px]" />
                     <TextField label="Giá mục tiêu 2024" fullWidth className="!mb-[20px]" />
                     <TextField label="Giá mục tiêu 2025" fullWidth className="!mb-[20px]" />
+                    {isBetaPage &&
+                        <TextField label="MA" fullWidth className="!mb-[20px]" />
+                    }
                     <LoadingButton variant="contained" type="submit" fullWidth loading={loading}>Thêm mã</LoadingButton>
                 </form>
             </Box>

@@ -1,6 +1,5 @@
-import { Button } from "@mui/base";
 import { LoadingButton } from "@mui/lab";
-import { Box, Modal } from "@mui/material"
+import { Box, Button, Modal } from "@mui/material"
 import { useState } from "react";
 import axiosClient from "~/api/axiosClient";
 
@@ -15,14 +14,18 @@ const style = {
     p: 4,
 };
 
-const ModalDelete = ({openModalDelete, handleCloseModalDelete, dataModal, setData, data}: any) => {
+const ModalDelete = ({ openModalDelete, handleCloseModalDelete, dataModal, setData, data }: any) => {
     const [loading, setLoading] = useState<boolean>(false)
     const handleDelete = async () => {
         try {
             setLoading(true)
             await axiosClient.post('investment/delete-beta-watch-list', { code: dataModal.code })
-            const newData = [...data].filter(item => item.code != dataModal.code)
-            setData(newData)
+            setData((prev: any) => {
+                const newData = [...prev].filter(item => item.code != dataModal.code)
+                return newData
+            })
+            // const newData = [...data].filter(item => item.code != dataModal.code)
+            // setData(newData)
 
             handleCloseModalDelete()
             setLoading(false)

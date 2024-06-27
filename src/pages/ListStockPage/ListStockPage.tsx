@@ -43,7 +43,7 @@ const ListStockPage = () => {
         { field: 'name', headerName: 'MA_max', type: 'string', sortable: false, width: 80, align: 'center', headerAlign: 'center' },
         { field: 'ma', headerName: 'Giá trị MA_max', type: 'string', sortable: false, flex: 1, align: 'center', headerAlign: 'center' },
         { field: 'total', headerName: 'Hiệu suất sinh lời theo MA_max (%)', type: 'number', sortable: true, flex: 1, align: 'center', headerAlign: 'center' },
-        { field: 'signal', headerName: 'Tín hiệu', type: 'string', sortable: true, width: 90, align: 'center', headerAlign: 'center', cellClassName: (params) => params.value == 'Mua' ? 'text-green-500' : (params.value == 'Bán' ? 'text-red-500' : (params.value == 'Hold mua' ? 'text-green-300' : 'text-red-300')) },
+        { field: 'signal', headerName: 'Tín hiệu', type: 'string', sortable: true, width: 90, align: 'center', headerAlign: 'center', cellClassName: (params) => params.value == 'MUA' ? 'text-green-500' : (params.value == 'BÁN' ? 'text-red-500' : (params.value == 'Hold mua' ? 'text-green-300' : 'text-red-300')) },
         {
             field: 'actions',
             headerName: '',
@@ -67,19 +67,21 @@ const ListStockPage = () => {
         const res = await axiosClient.get(`investment/beta-watch-list?from=${from}&to=${to}`)
 
         setData(res.data.map((item: any, index: number) => {
-            const closePrice = item.closePrice / 1000
-            const p_2024 = item.price_2024 ? ((item.price_2024 - closePrice) / closePrice * 100).toFixed(2) : 0
-            const p_2025 = item.price_2025 ? ((item.price_2025 - closePrice) / closePrice * 100).toFixed(2) : 0
+            const closePrice = parseFloat((item.closePrice / 1000).toFixed(2))
+            const p_2024 = item.price_2024 ? parseFloat(((item.price_2024 - closePrice) / closePrice * 100).toFixed(2)) : 0
+            const p_2025 = item.price_2025 ? parseFloat(((item.price_2025 - closePrice) / closePrice * 100).toFixed(2)) : 0
 
             return {
                 ...item,
                 id: index,
                 closePrice,
-                signal: item.signal == 0 ? 'Mua' : item.signal == 1 ? 'Bán' : item.signal == 2 ? 'Hold mua' : 'Hold bán',
-                total: (item.total * 100).toFixed(2),
+                signal: item.signal == 0 ? 'MUA' : item.signal == 1 ? 'BÁN' : item.signal == 2 ? 'Hold mua' : 'Hold bán',
+                total: parseFloat((item.total * 100).toFixed(2)),
+                price_2024: parseFloat((item.price_2024).toFixed(2)),
+                price_2025: parseFloat((item.price_2025).toFixed(2)),
                 p_2024,
                 p_2025,
-                ma: (item.ma / 1000).toFixed(2),
+                ma: parseFloat((item.ma / 1000).toFixed(2)),
             }
         }
         ));
