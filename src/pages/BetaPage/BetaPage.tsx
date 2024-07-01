@@ -172,7 +172,9 @@ const BetaPage = () => {
 
                         }
 
-                        if (elements && (item.signal != res[0].signal)) {
+                        const signal = res[0].signal == 0 ? 'MUA' : (res[0].signal == 1 ? 'BÁN': (res[0].signal == 2 ? 'Hold mua' : 'Hold bán')) 
+
+                        if (elements && (item.signal != signal)) {
                             const childElementSignal = elements.querySelector('div[data-field="signal"].MuiDataGrid-cell')
                             const classNameSignal = (res[0].signal == 0 || res[0].signal == 2) ? 'price-up' : 'price-down'
 
