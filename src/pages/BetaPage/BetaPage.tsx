@@ -1,8 +1,6 @@
 import { Delete, Edit } from "@mui/icons-material"
 import { Button, IconButton } from "@mui/material"
 import { DataGrid, GridColDef } from "@mui/x-data-grid"
-import "ag-grid-community/styles/ag-grid.css"; // Mandatory CSS required by the grid
-import "ag-grid-community/styles/ag-theme-quartz.css"; // Optional Theme applied to the grid
 import clsx from "clsx";
 import { useEffect, useRef, useState } from "react"
 import { io } from "socket.io-client"
@@ -170,8 +168,8 @@ const BetaPage = () => {
 
                         }
 
-                        if(elements && (item.signal != res[0].signal)){
-                            const childElementSignal =  elements.querySelector('div[data-field="signal"].MuiDataGrid-cell')
+                        if (elements && (item.signal != res[0].signal)) {
+                            const childElementSignal = elements.querySelector('div[data-field="signal"].MuiDataGrid-cell')
                             const classNameSignal = (res[0].signal == 0 || res[0].signal == 2) ? 'price-up' : 'price-down'
 
                             childElementSignal?.classList.add(classNameSignal)
