@@ -136,6 +136,8 @@ const BetaPage = () => {
                     const item = prevData[index];
                     const closePrice = parseFloat(item.closePrice.toFixed(2));
                     const newClosePrice = parseFloat((res[0].closePrice / 1000).toFixed(2));
+                    const closePricePrev = parseFloat((item.closePricePrev / 1000).toFixed(2));
+                    const change = parseFloat(((newClosePrice - closePricePrev) / closePricePrev * 100).toFixed(2))
 
                     if (closePrice !== newClosePrice) {
                         const newItem = {
@@ -145,7 +147,9 @@ const BetaPage = () => {
                             signal: res[0].signal == 0 ? 'MUA' : res[0].signal == 1 ? 'BÁN' : res[0].signal == 2 ? 'Hold mua' : 'Hold bán',
                             p_2024: item.price_2024 ? parseFloat(((item.price_2024 - newClosePrice) / newClosePrice * 100).toFixed(2)) : 0,
                             p_2025: item.price_2025 ? parseFloat(((item.price_2025 - newClosePrice) / newClosePrice * 100).toFixed(2)) : 0,
-                            total: parseFloat((res[0].total * 100).toFixed(2))
+                            total: parseFloat((res[0].total * 100).toFixed(2)),
+                            change,
+                            perChange: change + '%'
                         };
 
                         const elements = document.querySelector(`div[data-id="${item.id}"].MuiDataGrid-row`);
@@ -159,7 +163,7 @@ const BetaPage = () => {
                             div[data-field="total"].MuiDataGrid-cell
                             `);
 
-                            const className = newClosePrice > closePrice ? 'price-up' : 'price-down'
+                            const className = newClosePrice > closePricePrev ? 'price-up' : (newClosePrice < closePricePrev ? 'price-down' : 'price-no-down')
                             childElementClosePrice.forEach((value) => value?.classList.add(className))
 
                             setTimeout(() => {
@@ -245,6 +249,7 @@ const BetaPage = () => {
                         disableColumnSelector
                         disableColumnFilter={true}
                         disableColumnMenu={true}
+
                     />
                 </div>
 

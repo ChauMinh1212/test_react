@@ -9,3 +9,9 @@
     transition: background-color 0.2s ease-out;
     color: black!important
 }
+
+.price-no-down {
+    background-color: rgb(202, 202, 22)!important;
+    transition: background-color 0.2s ease-out;
+    color: black!important
+}
