@@ -231,7 +231,7 @@ const BetaPage = () => {
             {/* Modal thêm */}
             <ModalCreate openModalCreate={openModalCreate} handleCloseModalCreate={handleCloseModalCreate} setData={setData} data={data} isBetaPage={true} />
             {/* Modal detail cell */}
-            <ModalDetail openModalDetail={openModalDetail} handleCloseModalDetail={handleCloseModalDetail} dataModalDetail={dataModalDetail} />
+            <ModalDetail openModalDetail={openModalDetail} handleCloseModalDetail={handleCloseModalDetail} dataModalDetail={dataModalDetail} isBetaPage={true}/>
 
             <div className="m-[30px] ">
                 <div className="flex justify-end content-center mb-[20px]">

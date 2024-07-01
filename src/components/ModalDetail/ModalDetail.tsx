@@ -11,7 +11,7 @@ const style = {
     p: 4,
 };
 
-const ModalDetail = ({ openModalDetail, handleCloseModalDetail, dataModalDetail }: any) => {
+const ModalDetail = ({ openModalDetail, handleCloseModalDetail, dataModalDetail, isBetaPage }: any) => {
     return (
         <Modal
             open={openModalDetail}
@@ -28,9 +28,9 @@ const ModalDetail = ({ openModalDetail, handleCloseModalDetail, dataModalDetail 
                         <p className="mb-[20px] font-semibold">{`Tiềm năng tăng giá 2024 (%)`}</p>
                         <p className="mb-[20px] font-semibold">Giá mục tiêu 2025</p>
                         <p className="mb-[20px] font-semibold">{`Tiềm năng tăng giá 2025 (%)`}</p>
-                        <p className="mb-[20px] font-semibold">MA_max</p>
-                        <p className="mb-[20px] font-semibold">Giá trị MA_max</p>
-                        <p className="mb-[20px] font-semibold">{`Hiệu suất sinh lời theo MA_max (%)`}</p>
+                        <p className="mb-[20px] font-semibold">{isBetaPage ? 'MA' : 'MA_max'}</p>
+                        <p className="mb-[20px] font-semibold">Giá trị {isBetaPage ? 'MA' : 'MA_max'} </p>
+                        <p className="mb-[20px] font-semibold">{`Hiệu suất sinh lời theo ${isBetaPage ? 'MA' : 'MA_max'} (%)`}</p>
                         <p className="mb-[20px] font-semibold">Tín hiệu</p>
                     </div>
                     <div>
