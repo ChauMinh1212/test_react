@@ -1,6 +1,9 @@
 import { Delete, Edit } from "@mui/icons-material"
 import { Button, IconButton } from "@mui/material"
 import { DataGrid, GridColDef } from "@mui/x-data-grid"
+import "ag-grid-community/styles/ag-grid.css"; // Mandatory CSS required by the grid
+import "ag-grid-community/styles/ag-theme-quartz.css"; // Optional Theme applied to the grid
+import clsx from "clsx";
 import { useEffect, useRef, useState } from "react"
 import { io } from "socket.io-client"
 import axiosClient from "~/api/axiosClient"
@@ -8,6 +11,7 @@ import ModalCreate from "~/components/ModalCreate/ModalCreate"
 import ModalDelete from "~/components/ModalDelete/ModalDelete"
 import ModalDetail from "~/components/ModalDetail/ModalDetail"
 import ModalUpdate from "~/components/ModalUpdate/ModalUpdate"
+import './BetaPage.css'
 
 const BetaPage = () => {
     const [data, setData] = useState<any[]>([])
@@ -32,8 +36,27 @@ const BetaPage = () => {
     }
 
     const columns: GridColDef[] = [
-        { field: 'code', headerName: 'Mã', width: 60, align: 'center', headerAlign: 'center', cellClassName: 'cursor-pointer' },
-        { field: 'closePrice', headerName: 'Giá', width: 80, type: 'number', sortable: true, align: 'center', headerAlign: 'center' },
+        {
+            field: 'code', headerName: 'Mã', width: 60, align: 'center', headerAlign: 'center', cellClassName: (params) => clsx('cursor-pointer', {
+                'text-green-500': params.row.change > 0,
+                'text-red-500': params.row.change < 0,
+                'text-yellow-500': params.row.change == 0,
+            })
+        },
+        {
+            field: 'closePrice', headerName: 'Giá', width: 80, type: 'number', sortable: true, align: 'center', headerAlign: 'center', cellClassName: (params) => clsx({
+                'text-green-500': params.row.change > 0,
+                'text-red-500': params.row.change < 0,
+                'text-yellow-500': params.row.change == 0,
+            })
+        },
+        {
+            field: 'perChange', headerName: '+/-', width: 80, type: 'string', sortable: true, align: 'center', headerAlign: 'center', cellClassName: (params) => clsx({
+                'text-green-500': params.row.change > 0,
+                'text-red-500': params.row.change < 0,
+                'text-yellow-500': params.row.change == 0,
+            })
+        },
         { field: 'price_2024', headerName: 'Giá mục tiêu 2024', type: 'number', sortable: true, flex: 1, align: 'center', headerAlign: 'center' },
         { field: 'p_2024', headerName: 'Tiềm năng tăng giá 2024 (%)', type: 'number', sortable: true, flex: 1, align: 'center', headerAlign: 'center' },
         { field: 'price_2025', headerName: 'Giá mục tiêu 2025', type: 'number', sortable: true, flex: 1, align: 'center', headerAlign: 'center' },
@@ -79,6 +102,8 @@ const BetaPage = () => {
                 p_2024,
                 p_2025,
                 ma: parseFloat((item.ma / 1000).toFixed(2)),
+                change: parseFloat(((item.closePrice - item.closePricePrev) / item.closePricePrev * 100).toFixed(2)),
+                perChange: parseFloat(((item.closePrice - item.closePricePrev) / item.closePricePrev * 100).toFixed(2)) + '%'
             }
         }
         ));
@@ -102,60 +127,69 @@ const BetaPage = () => {
             })
 
             socketRef.current.on('listen-ma-co-phieu', (res: any) => {
-                // const index = data.findIndex(item => item.code == res[0].code)
-                // const item = data[index]
-
-                // const closePrice = parseFloat(item.closePrice.toFixed(2))
-                // const newClosePrice = parseFloat((res[0].closePrice / 1000).toFixed(2))
-
-                // if (closePrice != newClosePrice) {
-                //     console.log(item.code);
-                //     console.log(closePrice);
-                //     console.log(newClosePrice);
-                //     console.log('-----------------------');
-
-
-                //     const newItem = {
-                //         ...item,
-                //         closePrice: newClosePrice,
-                //         ma: parseFloat((res[0].ma / 1000).toFixed(2)),
-                //         signal: res[0].signal == 0 ? 'MUA' : res[0].signal == 1 ? 'BÁN' : res[0].signal == 2 ? 'Hold mua' : 'Hold bán'
-                //     }
-                //     const newData = [...data]
-                //     newData[index] = newItem
-                //     setData(newData);
-                // }
-
                 setData(prevData => {
                     const index = prevData.findIndex(item => item.code == res[0].code);
-            
+
                     if (index === -1) {
-                      console.error("Không tìm thấy mục với code:", res[0].code);
-                      return prevData;
+                        console.error("Không tìm thấy mục với code:", res[0].code);
+                        return prevData;
                     }
-            
+
                     const item = prevData[index];
                     const closePrice = parseFloat(item.closePrice.toFixed(2));
                     const newClosePrice = parseFloat((res[0].closePrice / 1000).toFixed(2));
-            
-                    if (closePrice !== newClosePrice) {
-            
-                      const newItem = {
-                        ...item,
-                        closePrice: newClosePrice,
-                        ma: parseFloat((res[0].ma / 1000).toFixed(2)),
-                        signal: res[0].signal == 0 ? 'MUA' : res[0].signal == 1 ? 'BÁN' : res[0].signal == 2 ? 'Hold mua' : 'Hold bán'
-                      };
-            
-                      const newData = [...prevData];
-                      newData[index] = newItem;
-            
-                      return newData;
-                    }
-            
-                    return prevData;
-                  });
 
+                    if (closePrice !== newClosePrice) {
+                        const newItem = {
+                            ...item,
+                            closePrice: newClosePrice,
+                            ma: parseFloat((res[0].ma / 1000).toFixed(2)),
+                            signal: res[0].signal == 0 ? 'MUA' : res[0].signal == 1 ? 'BÁN' : res[0].signal == 2 ? 'Hold mua' : 'Hold bán',
+                            p_2024: item.price_2024 ? parseFloat(((item.price_2024 - newClosePrice) / newClosePrice * 100).toFixed(2)) : 0,
+                            p_2025: item.price_2025 ? parseFloat(((item.price_2025 - newClosePrice) / newClosePrice * 100).toFixed(2)) : 0,
+                            total: parseFloat((res[0].total * 100).toFixed(2))
+                        };
+
+                        const elements = document.querySelector(`div[data-id="${item.id}"].MuiDataGrid-row`);
+                        if (elements) {
+                            const childElementClosePrice = elements.querySelectorAll(`
+                            div[data-field="closePrice"].MuiDataGrid-cell, 
+                            div[data-field="perChange"].MuiDataGrid-cell, 
+                            div[data-field="ma"].MuiDataGrid-cell,
+                            div[data-field="p_2024"].MuiDataGrid-cell,
+                            div[data-field="p_2025"].MuiDataGrid-cell,
+                            div[data-field="total"].MuiDataGrid-cell
+                            `);
+
+                            const className = newClosePrice > closePrice ? 'price-up' : 'price-down'
+                            childElementClosePrice.forEach((value) => value?.classList.add(className))
+
+                            setTimeout(() => {
+                                childElementClosePrice?.forEach((value) => value?.classList.remove(className))
+                            }, 500)
+
+                        }
+
+                        if(elements && (item.signal != res[0].signal)){
+                            const childElementSignal =  elements.querySelector('div[data-field="signal"].MuiDataGrid-cell')
+                            const classNameSignal = (res[0].signal == 0 || res[0].signal == 2) ? 'price-up' : 'price-down'
+
+                            childElementSignal?.classList.add(classNameSignal)
+
+                            setTimeout(() => {
+                                childElementSignal?.classList.remove(classNameSignal)
+                            }, 500)
+
+                        }
+
+                        const newData = [...prevData];
+                        newData[index] = newItem;
+
+                        return newData;
+                    }
+
+                    return prevData;
+                });
 
             });
 
@@ -164,6 +198,8 @@ const BetaPage = () => {
             };
         }
     }, [dataLoaded]);
+
+
 
     const handleDeleteClick = (row: any) => {
         setDataModal(row)
@@ -209,8 +245,11 @@ const BetaPage = () => {
                         onCellClick={handleDetailClick}
                         disableRowSelectionOnClick
                         disableColumnSelector
+                        disableColumnFilter={true}
+                        disableColumnMenu={true}
                     />
                 </div>
+
             </div>
         </>
 

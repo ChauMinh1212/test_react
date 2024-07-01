@@ -1,0 +1,11 @@
+.price-up {
+    background-color: lightgreen!important;
+    transition: background-color 0.2s ease-out;
+    color: black!important
+}
+
+.price-down {
+    background-color: lightcoral!important;
+    transition: background-color 0.2s ease-out;
+    color: black!important
+}
